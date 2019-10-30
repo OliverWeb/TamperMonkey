@@ -11,6 +11,15 @@
 var status = 1;
 (function(){
     'use strict';
+    /* 重置页面元素 */
+    $('html').css('width','100%');
+    $('html').css('height','100%');
+    $('html').css('overflow-y','hidden');
+    $('body').css('width','100%');
+    $('body').css('height','100%');
+    $('#swagger-ui').css('width','100%');
+    $('#swagger-ui').css('height','100%');
+    $('#swagger-ui').css('overflow','auto');
     $('#swagger-ui').on('click','.opblock-summary-method',function (e) {
         e.stopPropagation()
         // 方法名
@@ -38,13 +47,11 @@ var status = 1;
         insetHtml()
     },1000)
     function insetHtml(){
-        document.getElementById('swagger-ui').insertAdjacentHTML('beforeBegin',`<div style="width: 100%;height: 100%;position: fixed;top: 0;left: 0;bottom: 0;right: 0"><div style="height: 100%;width: 100%">
-<div id="dragEle" style="width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px">
+        document.getElementsByTagName('body')[0].insertAdjacentHTML('afterBegin',`<div id="dragEle" style="width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="1"/>JSON字段
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="2"/>自动生成
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="3"/>simple
-</div>
-</div></div>`);
+</div>`);
         // 设置拖拽元素，自由拖动
         $('#dragEle').myDrag({
             parent:'parent', //定义拖动不能超出的外框,拖动范围    
