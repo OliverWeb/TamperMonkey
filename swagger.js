@@ -40,6 +40,7 @@ if (window.location.href.includes('swagger-ui')) {
                         var method = $(e.currentTarget).text()
                         var api =  $(e.currentTarget).next().find('span').text()
                         var name = api.match(/{?\w+}?$/)[0].replace(/[{}]/g, '')
+                        copyText('',`${moudleName}/${name}-${method.toLowerCase()}`)
                         /* 赋值文本 */
                         function copyText (id, attr) {
                             let target = null;

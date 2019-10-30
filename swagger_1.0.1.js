@@ -8,106 +8,143 @@
 // @include      /^http?:\/\/(\w+\.)?swagger-ui.html/
 // @grant        none
 // ==/UserScript==
-var status = 1;
-(function(){
-    'use strict';
-    /* 重置页面元素 */
-    $('html').css('width','100%');
-    $('html').css('height','100%');
-    $('html').css('overflow-y','hidden');
-    $('body').css('width','100%');
-    $('body').css('height','100%');
-    $('#swagger-ui').css('width','100%');
-    $('#swagger-ui').css('height','100%');
-    $('#swagger-ui').css('overflow','auto');
-    $('#swagger-ui').on('click','.opblock-summary-method',function (e) {
-        e.stopPropagation()
-        // 方法名
-        let method = $(e.currentTarget).text()
-        // 当前api
-        let api =  $(e.currentTarget).next().find('span').text()
-        console.log('点击了')
-        if (status === 1) {
-            copyText('',`this.$service('${method}', '/SERVICE-SYSTEM${api}', params)`)
-        }else if(status === 2){
-            console.log()
-            copyText('',`this.$service('${method}', '/SERVICE-SYSTEM${api}', params)`)
-        }else if(status === 3){
-            copyText('',`this.$service('${method}', '/SERVICE-SYSTEM${api}', params)`)
-        }else {
-            console.log('\x1B[32m%s\x1B[0m', '未设置，可能有异常')
-        }
-    })
-    $('body').on('click','#dragEle',function (e) {
-        let val = $(e.target).val()
-        localStorage.setItem("checkValue",val)
+var status = 2;
 
+(function () {
+    let prex = ''
+    let target = location.href.split('/').filter((item) => {
+        return  item.includes('SERVICE-')
     })
-    setTimeout(() => {
-        insetHtml()
-    },1000)
-    function insetHtml(){
-        document.getElementsByTagName('body')[0].insertAdjacentHTML('afterBegin',`<div id="dragEle" style="width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
+    if (target[0]) {
+        prex = '/'+ target[0]
+    }
+    console.log(prex)
+    console.log(location.href.indexOf('swagger-ui.html#/'))
+    if (location.href.indexOf('swagger-ui.html#/') > 0) {
+        console.log(location.href.indexOf('swagger-ui.html#/'))
+        /* 重置页面元素 */
+        $('html').css('width', '100%')
+        $('html').css('height', '100%')
+        $('html').css('overflow-y', 'hidden')
+        $('body').css('width', '100%')
+        $('body').css('height', '100%')
+        $('#swagger-ui').css('width', '100%')
+        $('#swagger-ui').css('height', '100%')
+        $('#swagger-ui').css('overflow', 'auto')
+        $('#swagger-ui').on('click', '.opblock-summary-method', function (e) {
+            e.stopPropagation()
+            // 模块名称
+            let moudleName = $(e.currentTarget).parent().parent().parent().parent().prev('.opblock-tag').find('span').text()
+            //
+            let summary = $(e.currentTarget).next().next().text()
+            // 请求方法
+            let method = $(e.currentTarget).text()
+            // 当前api
+            let api = $(e.currentTarget).next().find('span').text()
+            // api的最后的一位和请求方法的拼接
+            let name = api.match(/{?\w+}?$/)[0].replace(/[{}]/g, '')
+            console.log(status)
+            if (status === 1) {
+                copyText('', `/**
+             * @tag  ${moudleName}>${api}
+             * @summary ${summary}
+             * @pageNum
+             * @pageSize
+             * @search
+             */
+             this.$service('${method}', '${prex}${api}', params)`)
+            } else if (status === 2) {
+                copyText('', `${moudleName}/${name}-${method.toLowerCase()}`)
+            } else if (status === 3) {
+                copyText('',
+                  `'${method}', '/SERVICE-SYSTEM${api}'`)
+            } else {
+                console.log('\x1B[32m%s\x1B[0m', '未设置，可能有异常')
+            }
+        })
+        $('body').on('click', '#dragEle', function (e) {
+            let val = $(e.target).val()
+            localStorage.setItem('checkValue', val)
+        })
+        setTimeout(() => {
+            insetHtml()
+        }, 1000)
+
+        function insetHtml () {
+            document.getElementsByTagName('body')[0].insertAdjacentHTML(
+              'beforeend', `<div id="dragEle" style="width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="1"/>JSON字段
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="2"/>自动生成
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="3"/>simple
-</div>`);
-        // 设置拖拽元素，自由拖动
-        $('#dragEle').myDrag({
-            parent:'parent', //定义拖动不能超出的外框,拖动范围    
-            randomPosition:false, //初始化随机位置    
-            direction:'all', //方向    
-            handler:false, //把手    
-            dragStart:function(x,y){}, //拖动开始 x,y为当前坐标    
-            dragEnd:function(x,y){}, //拖动停止 x,y为当前坐标    
-            dragMove:function(x,y){} //拖动进行中 x,y为当前坐标    
-        });
-        let checkValue = localStorage.getItem("checkValue")
-        if (checkValue) {
-            $('.apicheckbox').eq(checkValue-1).attr("checked", "checked");
-            status = Number(checkValue);
-        }
-    }
-    /**
-     * 点击事件
-     */
-    /**
-     * 粘贴文本函数
-     * @param id
-     * @param attr
-     */
-    function copyText (id, attr) {
-        let target = null;
-        if (attr) {
-            target = document.createElement('div');
-            target.id = 'tempTarget';
-            target.style.opacity = '0';
-            if (id) {
-                let curNode = document.querySelector('#' + id);
-                target.innerText = curNode[attr];
-            } else {
-                target.innerText = attr;
+</div>`)
+            // 设置拖拽元素，自由拖动
+            $('#dragEle').myDrag({
+                parent: 'parent', //定义拖动不能超出的外框,拖动范围    
+                randomPosition: false, //初始化随机位置    
+                direction: 'all', //方向    
+                handler: false, //把手    
+                dragStart: function (x, y) {}, //拖动开始 x,y为当前坐标    
+                dragEnd: function (x, y) {}, //拖动停止 x,y为当前坐标    
+                dragMove: function (x, y) {} //拖动进行中 x,y为当前坐标    
+            })
+            let checkValue = localStorage.getItem('checkValue')
+            // 点击选择框，选择模式
+            $('.apicheckbox').click(function (e) {
+                status = Number($(e.target).val())
+                console.log(status)
+            })
+            // 从本地localstorage，获取
+            if (checkValue) {
+                $('.apicheckbox').eq(checkValue - 1).attr('checked', 'checked')
+                status = Number(checkValue)
+            }else {
+                // 默认第二个
+                $('.apicheckbox').eq(1).attr('checked', 'checked')
+                status = 2
             }
-            document.body.appendChild(target);
-        } else {
-            target = document.querySelector('#' + id);
         }
 
-        try {
-            let range = document.createRange();
-            range.selectNode(target);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            console.log('复制成功')
-        } catch (e) {
-            console.log('\x1B[31m%s\x1B[0m', '复制失败')
-        }
+        /**
+         * 点击事件
+         */
+        /**
+         * 粘贴文本函数
+         * @param id
+         * @param attr
+         */
+        function copyText (id, attr) {
+            let target = null
+            if (attr) {
+                target = document.createElement('div')
+                target.id = 'tempTarget'
+                target.style.opacity = '0'
+                if (id) {
+                    let curNode = document.querySelector('#' + id)
+                    target.innerText = curNode[attr]
+                } else {
+                    target.innerText = attr
+                }
+                document.body.appendChild(target)
+            } else {
+                target = document.querySelector('#' + id)
+            }
 
-        if (attr) {
-            // remove temp target
-            target.parentElement.removeChild(target);
+            try {
+                let range = document.createRange()
+                range.selectNode(target)
+                window.getSelection().removeAllRanges()
+                window.getSelection().addRange(range)
+                document.execCommand('copy')
+                window.getSelection().removeAllRanges()
+                console.log('复制成功')
+            } catch (e) {
+                console.log('\x1B[31m%s\x1B[0m', '复制失败')
+            }
+
+            if (attr) {
+                // remove temp target
+                target.parentElement.removeChild(target)
+            }
         }
     }
 })()

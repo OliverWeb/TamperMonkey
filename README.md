@@ -50,4 +50,4 @@ $(element).myDrag({    
     dragEnd:function(x,y){}, //拖动停止 x,y为当前坐标    
     dragMove:function(x,y){} //拖动进行中 x,y为当前坐标    
 });
-摘自  爱jQuery：http://www.aijquery.cn/html/chajian/117.html
+http://www.aijquery.cn/html/chajian/117.html
