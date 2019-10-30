@@ -9,6 +9,7 @@
 // @grant        none
 // ==/UserScript==
 var status = 2;
+var apiDoc= {};
 
 (function () {
     let prex = ''
@@ -18,10 +19,7 @@ var status = 2;
     if (target[0]) {
         prex = '/'+ target[0]
     }
-    console.log(prex)
-    console.log(location.href.indexOf('swagger-ui.html#/'))
     if (location.href.indexOf('swagger-ui.html#/') > 0) {
-        console.log(location.href.indexOf('swagger-ui.html#/'))
         /* 重置页面元素 */
         $('html').css('width', '100%')
         $('html').css('height', '100%')
@@ -43,15 +41,22 @@ var status = 2;
             let api = $(e.currentTarget).next().find('span').text()
             // api的最后的一位和请求方法的拼接
             let name = api.match(/{?\w+}?$/)[0].replace(/[{}]/g, '')
-            console.log(status)
+            let resultJson = ''
             if (status === 1) {
+                try {
+                    let schema = apiDoc.paths[api][method.toLowerCase()].parameters[0].schema.$ref.split('/')
+                    console.log(schema)
+                    let str = schema[schema.length-1]
+                    let json = apiDoc.definitions[str].properties
+                    resultJson = clearObject(json)
+                } catch (error) {
+                    console.log(error)
+                }
                 copyText('', `/**
              * @tag  ${moudleName}>${api}
              * @summary ${summary}
-             * @pageNum
-             * @pageSize
-             * @search
              */
+             let params = ${JSON.stringify(resultJson)}
              this.$service('${method}', '${prex}${api}', params)`)
             } else if (status === 2) {
                 copyText('', `${moudleName}/${name}-${method.toLowerCase()}`)
@@ -68,13 +73,22 @@ var status = 2;
         })
         setTimeout(() => {
             insetHtml()
-        }, 1000)
+            console.log($('.url').text())
+            $.ajax({
+                type: "GET",
+                url: $('.url').text(),
+                dataType: "json",
+                success: function(data){
+                    apiDoc = data
+                }
+            });
+        }, 2000)
 
         function insetHtml () {
             document.getElementsByTagName('body')[0].insertAdjacentHTML(
               'beforeend', `<div id="dragEle" style="cursor: move;width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="1"/>JSON字段
-\t<input class="apicheckbox" name="AdPrintMode" type="radio" value="2"/>自动生成
+\t<input class="apicheckbox" name="AdPrintMode" type="radio" value="2"/>node脚本
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="3"/>simple
 </div>`)
             // 设置拖拽元素，自由拖动
@@ -83,7 +97,6 @@ var status = 2;
             // 点击选择框，选择模式
             $('.apicheckbox').click(function (e) {
                 status = Number($(e.target).val())
-                console.log(status)
             })
             // 从本地localstorage，获取
             if (checkValue) {
@@ -137,6 +150,20 @@ var status = 2;
                 // remove temp target
                 target.parentElement.removeChild(target)
             }
+        }
+        function clearObject (initObject, whiteList = []) {
+            Object.keys(initObject).forEach((key) => {
+                if (whiteList.length > 0) {
+                    whiteList.map((item) => {
+                        if (item !== key) {
+                            initObject[key] = null
+                        }
+                    })
+                } else {
+                    initObject[key] = null
+                }
+            })
+            return initObject
         }
     }
 })()
