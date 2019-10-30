@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+</head>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="./jquery.drag.js"></script>
+<style>
+	html,body{
+		height: 100%;
+	}
+</style>
+<body>
+<div style="position: fixed;width:100%;height:100%;top: 0;left: 0;background: red">
+
+</div>
+</body>
+<script>
+function divClick(){
+    var show="";
+    var apm = document.getElementsByName("AdPrintMode");
+    for(var i=0;i<apm.length;i++){
+        if(apm[i].checked)
+            show = apm[i].value;
+    }
+    console.log(show)
+}
+$('#dragEle').myDrag({
+    parent:'parent', //定义拖动不能超出的外框,拖动范围    
+    randomPosition:true, //初始化随机位置    
+    direction:'all', //方向    
+    handler:false, //把手    
+    dragStart:function(x,y){}, //拖动开始 x,y为当前坐标    
+    dragEnd:function(x,y){}, //拖动停止 x,y为当前坐标    
+    dragMove:function(x,y){} //拖动进行中 x,y为当前坐标    
+});
+</script>
+</html>
