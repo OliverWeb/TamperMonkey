@@ -72,21 +72,13 @@ var status = 2;
 
         function insetHtml () {
             document.getElementsByTagName('body')[0].insertAdjacentHTML(
-              'beforeend', `<div id="dragEle" style="width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
+              'beforeend', `<div id="dragEle" style="cursor: move;width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="1"/>JSON字段
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="2"/>自动生成
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="3"/>simple
 </div>`)
             // 设置拖拽元素，自由拖动
-            $('#dragEle').myDrag({
-                parent: 'parent', //定义拖动不能超出的外框,拖动范围    
-                randomPosition: false, //初始化随机位置    
-                direction: 'all', //方向    
-                handler: false, //把手    
-                dragStart: function (x, y) {}, //拖动开始 x,y为当前坐标    
-                dragEnd: function (x, y) {}, //拖动停止 x,y为当前坐标    
-                dragMove: function (x, y) {} //拖动进行中 x,y为当前坐标    
-            })
+            $( "#dragEle" ).draggable();
             let checkValue = localStorage.getItem('checkValue')
             // 点击选择框，选择模式
             $('.apicheckbox').click(function (e) {
