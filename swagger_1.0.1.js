@@ -63,7 +63,13 @@ var apiDoc= {};
             } else if (status === 3) {
                 copyText('',
                   `'${method}', '/SERVICE-SYSTEM${api}'`)
-            } else {
+            } else if(status === 4){
+                copyText('', `/**
+             * @tag  ${moudleName}>${api}
+             * @summary ${summary}
+             */
+             this.$service('${method}', '${prex}${api}', params)`)
+            }else {
                 console.log('\x1B[32m%s\x1B[0m', '未设置，可能有异常')
             }
         })
@@ -86,10 +92,11 @@ var apiDoc= {};
 
         function insetHtml () {
             document.getElementsByTagName('body')[0].insertAdjacentHTML(
-              'beforeend', `<div id="dragEle" style="cursor: move;width: 268px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
+              'beforeend', `<div id="dragEle" style="cursor: move;width: 341px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="1"/>JSON字段
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="2"/>node脚本
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="3"/>simple
+\t<input class="apicheckbox" name="AdPrintMode" type="radio" value="4"/>注释
 </div>`)
             // 设置拖拽元素，自由拖动
             $( "#dragEle" ).draggable();
