@@ -51,3 +51,4 @@ $(element).myDrag({    
     dragMove:function(x,y){} //拖动进行中 x,y为当前坐标    
 });
 http://www.aijquery.cn/html/chajian/117.html
+// @require      file://D:\tools\TamperMonkey\swagger_1.0.1.js
