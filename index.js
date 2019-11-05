@@ -4,13 +4,14 @@
 // @version      1.0.1
 // @description  try to take over the world!
 // @author       Oliver_web@163.com
-// @match        http://*/*swagger-ui.html*
+// @match        http://*/*
+// @include      /^http?:\/\/(\w+\.)?swagger-ui.html/
 // @require      https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js
 // @require      https://cdn.bootcss.com/jqueryui/1.12.1/jquery-ui.js
 // @require      http://47.104.64.155/nginx/file/cdn/jquery.drag.js
 // @grant        none
 // ==/UserScript==
-var status = 5;
+var status = 2;
 var apiDoc= {};
 
 (function () {
@@ -44,7 +45,6 @@ var apiDoc= {};
             // api的最后的一位和请求方法的拼接
             let name = api.match(/{?\w+}?$/)[0].replace(/[{}]/g, '')
             let resultJson = ''
-            /* 判断类型这里可以进行随意修改 */
             if (status === 1) {
                 try {
                     let schema = apiDoc.paths[api][method.toLowerCase()].parameters[0].schema.$ref.split('/')
@@ -65,16 +65,14 @@ var apiDoc= {};
                 copyText('', `${moudleName}/${name}-${method.toLowerCase()}`)
             } else if (status === 3) {
                 copyText('',
-                        `'${method}', '/SERVICE-SYSTEM${api}'`)
+                  `'${method}', '/SERVICE-SYSTEM${api}'`)
             } else if(status === 4){
                 copyText('', `/**
              * @tag  ${moudleName}>${api}
              * @summary ${summary}
              */
              this.$service('${method}', '${prex}${api}', params)`)
-            } else if(status === 5){
-                copyText('', `this.$service('${method}', '${prex}${api}', params)`)
-            } else {
+            }else {
                 console.log('\x1B[32m%s\x1B[0m', '未设置，可能有异常')
             }
         })
@@ -97,12 +95,11 @@ var apiDoc= {};
 
         function insetHtml () {
             document.getElementsByTagName('body')[0].insertAdjacentHTML(
-                    'beforeend', `<div id="dragEle" style="cursor: move;width: 402px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
+              'beforeend', `<div id="dragEle" style="cursor: move;width: 341px;height: 32px;line-height:32px;border-radius: 8px;color: #fff;background-color:#409eff;position: fixed;top: 13px;left: 160px;z-index: 9999999">
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="1"/>JSON字段
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="2"/>node脚本
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="3"/>simple
 \t<input class="apicheckbox" name="AdPrintMode" type="radio" value="4"/>注释
-\t<input class="apicheckbox" name="AdPrintMode" type="radio" value="5"/>常用
 </div>`)
             // 设置拖拽元素，自由拖动
             $( "#dragEle" ).draggable();
@@ -179,6 +176,3 @@ var apiDoc= {};
         }
     }
 })()
-// 电脑生
-// @require      file://D:\tools\TamperMonkey\swagger_1.0.1.js
-// 缺少在线更新
